@@ -6,6 +6,8 @@ RULE = {
   count: 5
 }
 
+$storage = Hash.new { |h,k| h[k] = 0 }
+
 # actions
 def greater_then(value)
   value > RULE[:count]
@@ -16,17 +18,19 @@ def equal(value)
 end
 
 # server
-def request(*args)
-  if args[1] == RULE[:object]
-    puts send(RULE[:operation], args[0]) ? 'YES' : 'NO'
+def request(object)
+  $storage[object] += 1
+
+  if object == RULE[:object]
+    puts send(RULE[:operation], $storage[object]) ? 'YES' : 'NO'
   else
-    puts "No rules found for '#{args[1]}'"
+    puts "No rules found for '#{object}'"
   end
 end
 
 # test app
 objects = [:credit_card, :email, :ip]
-(1..10).each do |i|
+(1..20).each do
   object = objects.sample
-  request(i, object)
+  request(object)
 end
