@@ -1,5 +1,5 @@
 RULE = {
-  #object: :credit_card,
+  object: :credit_card,
   #action: :request,
   #period: 2.hours,
   operation: :greater_then,
@@ -16,11 +16,17 @@ def equal(value)
 end
 
 # server
-def request(*arg)
-  puts send(RULE[:operation], arg[0]) ? 'YES' : 'NO'
+def request(*args)
+  if args[1] == RULE[:object]
+    puts send(RULE[:operation], args[0]) ? 'YES' : 'NO'
+  else
+    puts "No rules found for '#{args[1]}'"
+  end
 end
 
 # test app
+objects = [:credit_card, :email, :ip]
 (1..10).each do |i|
-  request(i)
+  object = objects.sample
+  request(i, object)
 end
