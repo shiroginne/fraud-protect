@@ -1,13 +1,13 @@
 RULE1 = {
   object: :credit_card,
-  period: 3, # only seconds
+  period: 12,
   operation: :greater_then,
-  value: 5
+  value: 9
 }
 
 RULE2 = {
   object: :credit_card,
-  period: 2,
+  period: 5,
   operation: :equal,
   value: 3
 }
@@ -21,7 +21,7 @@ RULE3 = {
 
 RULES = [RULE1, RULE2, RULE3]
 
-$storage    = Hash.new { |h,k| h[k] = [] }
+$storage    = Hash.new { |h,k| h[k] = Hash.new {|ih,ik| ih[ik] = [] } }
 
 # actions
 def greater_then(current_value, rule_value)
@@ -34,13 +34,13 @@ end
 
 # server
 def request(object)
-  $storage[object] << Time.now
-
   result = {}
   object_rules(object).each do |rule|
-    $storage[object].delete_if {|time| (Time.now - rule[:period]) >= time } 
 
-    result[rule[:operation]] = send(rule[:operation], $storage[object].count, rule[:value])
+    $storage[object][rule[:operation]] << Time.now
+    $storage[object][rule[:operation]].delete_if {|time| (Time.now - rule[:period]) >= time } 
+
+    result[rule[:operation]] = send(rule[:operation], $storage[object][rule[:operation]].count, rule[:value])
   end
 
   result
@@ -56,7 +56,7 @@ objects = [:credit_card, :bad_password, :ip]
   sleep(1)
   puts "sleep #{'.'*i} #{i}"
 
-  object = :bad_password
+  object = :credit_card
   result = request(object)
   puts "Request '#{object}' is '#{result}'"
 end
