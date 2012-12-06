@@ -19,7 +19,13 @@ RULE3 = {
   value: 5
 }
 
-RULES = [RULE1, RULE2, RULE3]
+RULE4 = {
+  object: :bad_password,
+  operation: :equal,
+  value: 5
+}
+
+RULES = [RULE1, RULE2, RULE3, RULE4]
 
 $storage    = Hash.new { |h,k| h[k] = Hash.new {|ih,ik| ih[ik] = [] } }
 
@@ -38,7 +44,7 @@ def request(object)
   object_rules(object).each do |rule|
 
     $storage[object][rule[:operation]] << Time.now
-    $storage[object][rule[:operation]].delete_if {|time| (Time.now - rule[:period]) >= time } 
+    $storage[object][rule[:operation]].delete_if {|time| (Time.now - rule[:period]) >= time } if rule[:period]
 
     result[rule[:operation]] = send(rule[:operation], $storage[object][rule[:operation]].count, rule[:value])
   end
@@ -56,7 +62,7 @@ objects = [:credit_card, :bad_password, :ip]
   sleep(1)
   puts "sleep #{'.'*i} #{i}"
 
-  object = :credit_card
+  object = :bad_password
   result = request(object)
   puts "Request '#{object}' is '#{result}'"
 end
