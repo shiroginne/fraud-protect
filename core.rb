@@ -1,6 +1,5 @@
 RULE1 = {
   object: :credit_card,
-  #action: :request,
   #period: 2.hours,
   operation: :greater_then,
   value: 5
@@ -8,13 +7,19 @@ RULE1 = {
 
 RULE2 = {
   object: :credit_card,
-  #action: :request,
   #period: 2.hours,
   operation: :equal,
   value: 3
 }
 
-RULES = [RULE1, RULE2]
+RULE3 = {
+  object: :bad_password,
+  #period: 2.hours,
+  operation: :greater_then,
+  value: 4
+}
+
+RULES = [RULE1, RULE2, RULE3]
 
 $storage = Hash.new { |h,k| h[k] = 0 }
 
@@ -44,7 +49,7 @@ def object_rules(object)
 end
 
 # test app
-objects = [:credit_card, :email, :ip]
+objects = [:credit_card, :bad_password, :ip]
 (1..20).each do
   object = objects.sample
   result = request(object)
