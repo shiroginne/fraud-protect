@@ -1,33 +1,6 @@
-RULE1 = {
-  object: :credit_card,
-  period: 12,
-  operation: :greater_then,
-  value: 9
-}
+require File.expand_path(File.join(Dir.pwd, 'rules.rb'))
 
-RULE2 = {
-  object: :credit_card,
-  period: 5,
-  operation: :equal,
-  value: 3
-}
-
-RULE3 = {
-  object: :bad_password,
-  period: 10,
-  operation: :greater_then,
-  value: 8
-}
-
-RULE4 = {
-  object: :bad_password,
-  operation: :equal,
-  value: 11
-}
-
-RULES = [RULE1, RULE2, RULE3, RULE4]
-
-$storage    = Hash.new { |h,k| h[k] = Hash.new {|ih,ik| ih[ik] = [] } }
+$storage = Hash.new { |h,k| h[k] = [] }
 
 # actions
 def greater_then(current_value, rule_value)
@@ -39,14 +12,20 @@ def equal(current_value, rule_value)
 end
 
 # server
-def request(object, value = nil)
+def key_name(params, operation)
+  "#{params[:object]}_#{params[:value]}_#{operation}"
+end
+
+def request(params)
   result = {}
-  object_rules(object).each do |rule|
+  
+  object_rules(params[:object]).each do |rule|
+    key = key_name(params, rule[:operation])
+    
+    $storage[key] << Time.now
+    $storage[key].delete_if {|time| (Time.now - rule[:period]) >= time } if rule[:period]
 
-    $storage[object][rule[:operation]] << Time.now
-    $storage[object][rule[:operation]].delete_if {|time| (Time.now - rule[:period]) >= time } if rule[:period]
-
-    l_value = value || $storage[object][rule[:operation]].count # !
+    l_value = $storage[key].count
 
     result[rule[:operation]] = send(rule[:operation], l_value, rule[:value])
   end
@@ -60,13 +39,7 @@ end
 
 # test app
 objects = [:credit_card, :bad_password, :ip]
-(1..20).each do |i|
-  sleep(1)
-  puts "sleep #{'.'*i} #{i}"
-
-  object = :bad_password
-  value = 10
-  result = request(object)
+1.upto(2_000_000).each do |i|
   
-  puts "Request '#{object}' is '#{result}'"
+  result = request({ object: :credit_card, value: i.to_s })
 end
