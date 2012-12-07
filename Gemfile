@@ -1,4 +1,5 @@
 source :rubygems
 
-gem 'sinatra'
+gem 'sinatra', :require => 'sinatra/base'
 gem 'redis'
+gem 'thin'

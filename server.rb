@@ -1,6 +1,3 @@
-$storage = Hash.new { |h,k| h[k] = [] }
-
-# actions
 def greater_then(current_value, rule_value)
   current_value > rule_value
 end
