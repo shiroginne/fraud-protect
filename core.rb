@@ -16,13 +16,13 @@ RULE3 = {
   object: :bad_password,
   period: 10,
   operation: :greater_then,
-  value: 5
+  value: 8
 }
 
 RULE4 = {
   object: :bad_password,
   operation: :equal,
-  value: 5
+  value: 11
 }
 
 RULES = [RULE1, RULE2, RULE3, RULE4]
@@ -39,14 +39,16 @@ def equal(current_value, rule_value)
 end
 
 # server
-def request(object)
+def request(object, value = nil)
   result = {}
   object_rules(object).each do |rule|
 
     $storage[object][rule[:operation]] << Time.now
     $storage[object][rule[:operation]].delete_if {|time| (Time.now - rule[:period]) >= time } if rule[:period]
 
-    result[rule[:operation]] = send(rule[:operation], $storage[object][rule[:operation]].count, rule[:value])
+    l_value = value || $storage[object][rule[:operation]].count # !
+
+    result[rule[:operation]] = send(rule[:operation], l_value, rule[:value])
   end
 
   result
@@ -63,6 +65,8 @@ objects = [:credit_card, :bad_password, :ip]
   puts "sleep #{'.'*i} #{i}"
 
   object = :bad_password
+  value = 10
   result = request(object)
+  
   puts "Request '#{object}' is '#{result}'"
 end
