@@ -1,4 +1,3 @@
-require 'sinatra'
 require 'json'
 
 require File.expand_path(File.join(Dir.pwd, 'rules.rb'))
