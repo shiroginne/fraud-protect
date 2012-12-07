@@ -1,11 +1,11 @@
 require 'rubygems'
 require 'bundler'
-
-require File.join(Dir.pwd, 'rules.rb')
-require File.join(Dir.pwd, 'storage.rb')
-require File.join(Dir.pwd, 'server.rb')
+require 'json'
 
 Bundler.require
+
+require File.join(Dir.pwd, 'rules.rb')
+require File.join(Dir.pwd, 'server.rb')
 
 require './core.rb'
 run FroudProtect
