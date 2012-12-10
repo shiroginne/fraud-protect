@@ -9,8 +9,8 @@ def equal(current_value, rule_value)
 end
 
 # server
-def key_name(params, operation)
-  "#{params[:object]}_#{params[:value]}_#{operation}"
+def key_name(params, rule)
+  [params[:object], params[:value], rule[:operation]].join('_')
 end
 
 def object_rules(object)
@@ -22,14 +22,13 @@ def server_request(params)
 
   object_rules(params[:object]).each do |rule|
 
-    key = key_name(params, rule[:operation])
+    key = key_name(params, rule)
 
-    $storage.lpush(key, Time.now.to_i)
+    $storage.rpush(key, Time.now.to_i)
 
     if rule[:period]
-      $storage.lrange(key, 0, -1).each do |time|
-        $storage.lrem(key, 1, time) if (Time.now.to_i - rule[:period]) >= time.to_i
-      end
+      slice_index = $storage.lrange(key, 0, -1).rindex {|time| (Time.now.to_i - rule[:period]) < time.to_i }
+      $storage.ltrim(key, slice_index, -1)
     end
 
     l_value = $storage.llen(key)
