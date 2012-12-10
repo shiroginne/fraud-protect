@@ -27,7 +27,7 @@ def server_request(params)
     $storage.rpush(key, Time.now.to_i)
 
     if rule[:period]
-      slice_index = $storage.lrange(key, 0, -1).rindex {|time| (Time.now.to_i - rule[:period]) < time.to_i }
+      slice_index = $storage.lrange(key, 0, -1).rindex {|time| (Time.now.to_i - time.to_i) >= rule[:period] }
       $storage.ltrim(key, slice_index, -1)
     end
 
