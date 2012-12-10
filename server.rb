@@ -19,25 +19,23 @@ end
 
 def server_request(params)
   result = {}
-  
+
   object_rules(params[:object]).each do |rule|
 
     key = key_name(params, rule[:operation])
 
-    $storage.sadd([key], Time.now.to_i)
-    
-    # $storage[key].delete_if {|time| (Time.now - rule[:period]) >= time } if rule[:period]
-    
+    $storage.lpush(key, Time.now.to_i)
+
     if rule[:period]
-      $storage.sdiff(key).each do |time|
-        $storage.srem(key, time) if (Time.now.to_i - rule[:period]) >= time.to_i
+      $storage.lrange(key, 0, -1).each do |time|
+        $storage.lrem(key, 1, time) if (Time.now.to_i - rule[:period]) >= time.to_i
       end
     end
 
-    l_value = $storage.scard(key)
+    l_value = $storage.llen(key)
 
     result[rule[:operation]] = send(rule[:operation], l_value, rule[:value])
   end
-  
+
   result
 end

@@ -18,26 +18,3 @@ RULE3 = {
 }
 
 RULES = [RULE1, RULE2, RULE3]
-
-REQUESTS = [
-  { object: :credit_card, value: '420' },
-  { object: :credit_card, value: '420' },
-  { object: :credit_card, value: '420' },
-  { object: :credit_card, value: '420' },
-  { object: :credit_card, value: '420' },
-  { object: :credit_card, value: '420' },
-  { object: :credit_card, value: '111' },
-  { object: :credit_card, value: '111' },
-  { object: :credit_card, value: '111' },
-  { object: :credit_card, value: '111' },
-  { object: :credit_card, value: '111' },
-  { object: :credit_card, value: '111' },
-  { object: :credit_card, value: '111' },
-  
-  { object: :email, value: 'john@example.com' },
-  { object: :email, value: 'john@example.com' },
-  { object: :email, value: 'john@example.com' },
-  { object: :email, value: 'john@example.com' },
-  { object: :email, value: 'john@example.com' },
-  
-].shuffle
